@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在虚拟机上搭建云平台环境（3）Controller和Computer网卡配置 Controller和Computer网卡配置 本文涉及到代码复制，粘贴。CSDN中会复制多余信息导致出错，选择删除多余信息，或者去我的Blog添加配置Julur.github.io">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在虚拟机上搭建云平台环境（3）Controller和Computer网卡配置">
+<meta property="og:url" content="http://yoursite.com/2020/04/05/%E5%9C%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8A%E6%90%AD%E5%BB%BA%E4%BA%91%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%EF%BC%883%EF%BC%89Controller%E5%92%8CComputer%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="Julur">
+<meta property="og:description" content="在虚拟机上搭建云平台环境（3）Controller和Computer网卡配置 Controller和Computer网卡配置 本文涉及到代码复制，粘贴。CSDN中会复制多余信息导致出错，选择删除多余信息，或者去我的Blog添加配置Julur.github.io">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405145224628.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405145435538.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405150004449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405150444633.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405145224628.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405145435538.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405151628388.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405151823440.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405153819415.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405153327794.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405154027572.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405154011257.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405154107848.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/202004051541455.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405154613360.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405154956576.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405155643417.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405155651293.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405155815986.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405155840815.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405160558634.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200405160712697.png">
+<meta property="article:published_time" content="2020-04-05T10:21:51.726Z">
+<meta property="article:modified_time" content="2020-04-05T11:36:35.944Z">
+<meta property="article:author" content="Julur">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20200405145224628.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70">
+
+<link rel="canonical" href="http://yoursite.com/2020/04/05/%E5%9C%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8A%E6%90%AD%E5%BB%BA%E4%BA%91%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%EF%BC%883%EF%BC%89Controller%E5%92%8CComputer%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>在虚拟机上搭建云平台环境（3）Controller和Computer网卡配置 | Julur</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?d851e990efa7f67c0e8f8de0786854a2";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+    <!-- 爆炸效果 -->
+<canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+<script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+<script type="text/javascript" src="/js/firework.js"></script>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Julur</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">在读垃圾大学生🦄，妄图拿博客吸粉🌈</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/05/%E5%9C%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8A%E6%90%AD%E5%BB%BA%E4%BA%91%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%EF%BC%883%EF%BC%89Controller%E5%92%8CComputer%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Julur">
+      <meta itemprop="description" content="客官😘，快来一起玩耍呀🤪">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Julur">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          在虚拟机上搭建云平台环境（3）Controller和Computer网卡配置
+        </h1>
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-04-05 18:21:51 / 修改时间：19:36:35" itemprop="dateCreated datePublished" datetime="2020-04-05T18:21:51+08:00">2020-04-05</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/04/05/%E5%9C%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8A%E6%90%AD%E5%BB%BA%E4%BA%91%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%EF%BC%883%EF%BC%89Controller%E5%92%8CComputer%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/04/05/%E5%9C%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%B8%8A%E6%90%AD%E5%BB%BA%E4%BA%91%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%EF%BC%883%EF%BC%89Controller%E5%92%8CComputer%E7%BD%91%E5%8D%A1%E9%85%8D%E7%BD%AE/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a href="">在虚拟机上搭建云平台环境（3）Controller和Computer网卡配置</a></p>
+<h2 id="Controller和Computer网卡配置"><a href="#Controller和Computer网卡配置" class="headerlink" title="Controller和Computer网卡配置"></a>Controller和Computer网卡配置</h2><blockquote>
+<p>本文涉及到代码复制，粘贴。CSDN中会复制多余信息导致出错，选择删除多余信息，或者去我的Blog添加配置<br>Julur.github.io</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="首先配置第一块网卡信息"><a href="#首先配置第一块网卡信息" class="headerlink" title="首先配置第一块网卡信息"></a>首先配置第一块网卡信息</h2><h1 id="一、首先配置Controller的一块网卡，打开Controller虚拟机"><a href="#一、首先配置Controller的一块网卡，打开Controller虚拟机" class="headerlink" title="==一、首先配置Controller的一块网卡，打开Controller虚拟机=="></a>==一、首先配置Controller的一块网卡，打开Controller虚拟机==</h1><p>==输入<code>ip a</code> 查询网卡信息，得到如下==<br><img src="https://img-blog.csdnimg.cn/20200405145224628.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述">)<img src="https://img-blog.csdnimg.cn/20200405145435538.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>==输入<code>vi /etc/sysconfig/network-scripts/ifcfg-eno16777736</code> 按<code>a</code>或<code>i</code>进入编辑模式    编写配置==<br><img src="https://img-blog.csdnimg.cn/20200405150004449.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>==需要修改的地方有两个==</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">BOOTPROTO=<span class="keyword">static</span> </span><br><span class="line"></span><br><span class="line">ONBOOT=yes</span><br></pre></td></tr></table></figure>
+<p>==需要添加的地方有四个==</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">NM_CONTROLLED=no </span><br><span class="line">IPADDR=<span class="number">192.168</span>.<span class="number">100.10</span>    </span><br><span class="line">PREFIX=<span class="number">24</span></span><br><span class="line">GATEWAY=<span class="number">192.168</span>.<span class="number">100.1</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20200405150444633.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>==编辑完之后按“esc”退出编辑模式，进入命令模式==<br>==然后输入“：”，输入wq。（q！ 不保存退出。 wq保存并退出）==</p>
+<p>输入<code>systemctl restart network.service</code> 重启网卡<br>输入<code>ip a</code> 查看网卡信息，检查是否已经更改</p>
+<blockquote>
+<p>至此Controller的第一块网卡配置完毕，接下来配置Computer的第一块网卡。<br>两台虚拟机的第二块网卡利用SecureCRTPortable工具配置，往下阅读</p>
+</blockquote>
+ <br/> 
+  <br/> 
+   <br/> 
+    <br/> 
+
+<h1 id="二、配置Computer的第一块网卡，打开Computer虚拟机"><a href="#二、配置Computer的第一块网卡，打开Computer虚拟机" class="headerlink" title="==二、配置Computer的第一块网卡，打开Computer虚拟机=="></a>==二、配置Computer的第一块网卡，打开Computer虚拟机==</h1><p>==输入<code>ip a</code> 查询网卡信息，得到如下==<br><img src="https://img-blog.csdnimg.cn/20200405145224628.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述">)<img src="https://img-blog.csdnimg.cn/20200405145435538.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>==输入<code>vi /etc/sysconfig/network-scripts/ifcfg-eno16777736</code> 按<code>a</code>或<code>i</code>进入编辑模式    编写配置==<br>==注意：Computer的网卡IP地址（IPADDR）&lt;唯一区别&gt;是IP：<em>192.168.100.20</em>==<br><img src="https://img-blog.csdnimg.cn/20200405151628388.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>==需要修改的地方有两个==</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">BOOTPROTO=<span class="keyword">static</span> </span><br><span class="line"></span><br><span class="line">ONBOOT=yes</span><br></pre></td></tr></table></figure>
+<p>==需要添加的地方有四个==</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">NM_CONTROLLED=no </span><br><span class="line">IPADDR=<span class="number">192.168</span>.<span class="number">100.20</span>    </span><br><span class="line">PREFIX=<span class="number">24</span></span><br><span class="line">GATEWAY=<span class="number">192.168</span>.<span class="number">100.1</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20200405151823440.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>==编辑完之后按“esc”退出编辑模式，进入命令模式==<br>==然后输入“：”，输入wq。（q！ 不保存退出。 wq保存并退出）==</p>
+<p>输入<code>systemctl restart network.service</code> 重启网卡<br>输入<code>ip a</code> 查看网卡信息，检查是否已经更改</p>
+<blockquote>
+<p>至此两台虚拟机的第一块网卡配置完毕，下面测试第一块网卡是否可以ping通<br>输入Ctrl +C可以终止ping</p>
+</blockquote>
+<p>在Controller下，输入</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping <span class="number">192.168</span>.<span class="number">100.20</span></span><br></pre></td></tr></table></figure>
+<p>在Computer下，输入</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping <span class="number">192.168</span>.<span class="number">100.10</span></span><br></pre></td></tr></table></figure>
+<p>在物理机PC上按下WIN+R，输入cmd，在终端中分别输入</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping <span class="number">192.168</span>.<span class="number">100.10</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping <span class="number">192.168</span>.<span class="number">100.20</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>至此两台虚拟机的连通性检测完毕<br>接下来利用SecureCRTPortable工具分别配置两台虚拟机的第二块电脑</p>
+</blockquote>
+ <br/> 
+  <br/> 
+   <br/> 
+    <br/> 
+
+
+<h2 id="配置第二块网卡信息"><a href="#配置第二块网卡信息" class="headerlink" title="配置第二块网卡信息"></a>配置第二块网卡信息</h2><h1 id="三、打开SecureCRTPortable工具"><a href="#三、打开SecureCRTPortable工具" class="headerlink" title="==三、打开SecureCRTPortable工具=="></a>==三、打开SecureCRTPortable工具==</h1><p>==打开两台虚拟机并闲置==<br><img src="https://img-blog.csdnimg.cn/20200405153819415.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>==进入SecureCRTPortable工具==<br><img src="https://img-blog.csdnimg.cn/20200405153327794.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h3 id="Tips："><a href="#Tips：" class="headerlink" title="Tips："></a>Tips：</h3><p>SecureCRT复制粘贴快捷键<br>复制：【Ctrl】+【Insert】<br><img src="https://img-blog.csdnimg.cn/20200405154027572.png" alt="在这里插入图片描述"></p>
+<p>粘贴：【Shift】+【Insert】 ==（推荐：或者鼠标右键）==<br><img src="https://img-blog.csdnimg.cn/20200405154011257.png" alt="在这里插入图片描述"><br></br><br></br><br></br></p>
+<h1 id="四、配置Controller的第二块网卡"><a href="#四、配置Controller的第二块网卡" class="headerlink" title="==四、配置Controller的第二块网卡=="></a>==四、配置Controller的第二块网卡==</h1><p>==连接Controller==<br><img src="https://img-blog.csdnimg.cn/20200405154107848.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>==输入<code>ip a</code> 查Controller的网卡配置==<br><img src="https://img-blog.csdnimg.cn/202004051541455.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>==前面我们已经更改了第一块网卡的配置，这次我们来改第二块网卡配置，也就是eno33554960 ==<br>复制以下代码，去Controller下点击鼠标右键，然后回车<br>输入 <code>vi /etc/sysconfig/network-scripts/ifcfg-eno33554960</code><img src="https://img-blog.csdnimg.cn/20200405154613360.png" alt="在这里插入图片描述"><br>==进入配置界面==<img src="https://img-blog.csdnimg.cn/20200405154956576.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>==此时不要按‘a’或者‘i’去编辑，在此界面输入 ggVG  看到全选后输入 d 删除，最后复制下面配置，去终端右键粘贴。粘贴完毕按‘esc’键，输入“：”  ，输入wq 。退出并保存。就行了==</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">TYPE=Ethernet</span><br><span class="line">ONBOOT=yes</span><br><span class="line">NM_CONTROLLED=no</span><br><span class="line">BOOTPROTO=<span class="keyword">static</span></span><br><span class="line">IPADDR=<span class="number">192.168</span>.<span class="number">200.10</span></span><br><span class="line">PREFIX=<span class="number">24</span></span><br></pre></td></tr></table></figure>
+<p>==在终端粘贴<code>systemctl restart network.service</code> 重启网卡==<br> <br/><br>  <br/> </p>
+<h1 id="四、配置Computer的第二块网卡"><a href="#四、配置Computer的第二块网卡" class="headerlink" title="==四、配置Computer的第二块网卡=="></a>==四、配置Computer的第二块网卡==</h1><p>==连接Computer==<img src="https://img-blog.csdnimg.cn/20200405155643417.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/20200405155651293.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>==在Computer的终端粘贴<code>vi /etc/sysconfig/network-scripts/ifcfg-eno33554960</code>==<br><img src="https://img-blog.csdnimg.cn/20200405155815986.png" alt="在这里插入图片描述"><br>==进入配置界面==<br><img src="https://img-blog.csdnimg.cn/20200405155840815.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0pheWNlTERT,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>==同理不要按‘a’或者‘i’去编辑，在此界面输入 ggVG  看到全选后输入 d 删除，最后复制下面配置，去终端右键粘贴。粘贴完毕按‘esc’键，输入“：”  ，输入wq 。退出并保存。就行了==</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">TYPE=Ethernet</span><br><span class="line">ONBOOT=yes</span><br><span class="line">NM_CONTROLLED=no</span><br><span class="line">BOOTPROTO=<span class="keyword">static</span></span><br><span class="line">IPADDR=<span class="number">192.168</span>.<span class="number">200.20</span></span><br><span class="line">PREFIX=<span class="number">24</span></span><br></pre></td></tr></table></figure>
+<p>==在终端粘贴<code>systemctl restart network.service</code> 重启网卡==</p>
+ <br/> 
+  <br/> 
+   <br/> 
+    <br/> 
+
+<h1 id="五、分别在controller和computer中添加地址映射"><a href="#五、分别在controller和computer中添加地址映射" class="headerlink" title="==五、分别在controller和computer中添加地址映射=="></a>==五、分别在controller和computer中添加地址映射==</h1><p>==分别在controller和computer的终端右键粘贴以下内容==</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi/etc/hosts</span><br></pre></td></tr></table></figure>
+<p>进入配置界面后输入“a”或“i”进入编辑，在结尾处右键粘贴以下内容</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">192.168</span>.<span class="number">100.10</span> controller </span><br><span class="line"><span class="number">192.168</span>.<span class="number">100.20</span> computer</span><br></pre></td></tr></table></figure>
+<p><img src="https://img-blog.csdnimg.cn/20200405160558634.png" alt="在这里插入图片描述"><br>==注意controller和computer都要配置==</p>
+<p>然后可以直接ping 对方的主机名，在computer中输入 ping controller， 在computer中输入controller<br><img src="https://img-blog.csdnimg.cn/20200405160712697.png" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>至此Controller和Computer的网卡配置全部完毕，接下来进入利用CRT上传软件包</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/30/%E6%88%91%E8%A6%81%E8%AE%B2/" rel="prev" title="我要讲">
+      <i class="fa fa-chevron-left"></i> 我要讲
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Controller和Computer网卡配置"><span class="nav-number">1.</span> <span class="nav-text">Controller和Computer网卡配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#首先配置第一块网卡信息"><span class="nav-number">2.</span> <span class="nav-text">首先配置第一块网卡信息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一、首先配置Controller的一块网卡，打开Controller虚拟机"><span class="nav-number"></span> <span class="nav-text">&#x3D;&#x3D;一、首先配置Controller的一块网卡，打开Controller虚拟机&#x3D;&#x3D;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、配置Computer的第一块网卡，打开Computer虚拟机"><span class="nav-number"></span> <span class="nav-text">&#x3D;&#x3D;二、配置Computer的第一块网卡，打开Computer虚拟机&#x3D;&#x3D;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置第二块网卡信息"><span class="nav-number">1.</span> <span class="nav-text">配置第二块网卡信息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、打开SecureCRTPortable工具"><span class="nav-number"></span> <span class="nav-text">&#x3D;&#x3D;三、打开SecureCRTPortable工具&#x3D;&#x3D;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Tips："><span class="nav-number">0.1.</span> <span class="nav-text">Tips：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四、配置Controller的第二块网卡"><span class="nav-number"></span> <span class="nav-text">&#x3D;&#x3D;四、配置Controller的第二块网卡&#x3D;&#x3D;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四、配置Computer的第二块网卡"><span class="nav-number"></span> <span class="nav-text">&#x3D;&#x3D;四、配置Computer的第二块网卡&#x3D;&#x3D;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#五、分别在controller和computer中添加地址映射"><span class="nav-number"></span> <span class="nav-text">&#x3D;&#x3D;五、分别在controller和computer中添加地址映射&#x3D;&#x3D;</span></a></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Julur"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Julur</p>
+  <div class="site-description" itemprop="description">客官😘，快来一起玩耍呀🤪</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:longdoushengjayce@gmail.com" title="E-Mail → mailto:longdoushengjayce@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/PuekinJ" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;PuekinJ" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Julur</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">3k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3 分钟</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'xc7I8Xewq0ypmjwPEkzWN1TR-MdYXbMMI',
+      appKey     : 'pgkspm9zQd2Cw3mKtYPkbEUz',
+      placeholder: "我不爽，我想讲!",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+
+</body>
+</html>
